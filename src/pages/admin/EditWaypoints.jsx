@@ -36,15 +36,15 @@ export default function EditWaypoints() {
   const [opslaan, setOpslaan] = useState(false);
   const [bericht, setBericht] = useState('');
 
-  async function laadWaypoints() {
+  const laadWaypoints = useCallback(async () => {
     const [r, wps] = await Promise.all([getRoute(routeId), getWaypoints(routeId)]);
     setRoute(r);
     setWaypoints(wps);
-  }
+  }, [routeId]);
 
   useEffect(() => {
     laadWaypoints();
-  }, [routeId]);
+  }, [laadWaypoints]);
 
   // Klik op kaart → nieuw waypoint toevoegen
   const handleMapClick = useCallback(
@@ -322,7 +322,7 @@ export default function EditWaypoints() {
                             min={1}
                             value={instr.afstand}
                             onChange={e =>
-                              updateInstructie(i, 'afstand', parseInt(e.target.value, 10))
+                              updateInstructie(i, 'afstand', parseInt(e.target.value, 10) || 50)
                             }
                             className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                           />

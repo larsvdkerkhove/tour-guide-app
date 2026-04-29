@@ -2,20 +2,16 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Iedereen kan gepubliceerde routes lezen
+    // Gepubliceerde routes zijn publiek leesbaar; schrijven enkel voor admins
     match /routes/{routeId} {
-      allow read: if resource.data.gepubliceerd == true;
+      allow read: if resource.data.gepubliceerd == true || (request.auth != null && isAdmin());
       allow write: if request.auth != null && isAdmin();
 
       match /waypoints/{waypointId} {
-        allow read: if get(/databases/$(database)/documents/routes/$(routeId)).data.gepubliceerd == true;
+        allow read: if get(/databases/$(database)/documents/routes/$(routeId)).data.gepubliceerd == true
+                    || (request.auth != null && isAdmin());
         allow write: if request.auth != null && isAdmin();
       }
-    }
-
-    // Alleen admins kunnen alles lezen/schrijven
-    match /routes/{routeId} {
-      allow read, write: if request.auth != null && isAdmin();
     }
 
     match /admins/{userId} {
